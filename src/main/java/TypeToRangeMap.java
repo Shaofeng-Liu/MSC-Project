@@ -11,15 +11,16 @@ public class TypeToRangeMap implements Serializable{
         prepareNewDataset();
     }
     private void readMap() throws IOException, ClassNotFoundException {
-        try(ObjectInputStream is =new ObjectInputStream(new FileInputStream(mapPath))){
+        try (ObjectInputStream is =new ObjectInputStream(new FileInputStream(mapPath))){
             this.vectorRangeMap=(HashMap<String, VectorRange>) is.readObject();
         }
+
     }
     private void writeMap() throws IOException {
+        try(ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(mapPath))) {
 
-       try (ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(mapPath))){
-           os.writeObject(vectorRangeMap);
-       }
+            os.writeObject(vectorRangeMap);
+        }
     }
     public  void prepareNewDataset() throws IOException, ClassNotFoundException {
 
@@ -38,41 +39,41 @@ public class TypeToRangeMap implements Serializable{
             String previousVectorType="";
             String currentVectorType;
             VectorRange currentRange=new VectorRange();
-            while((currentLine=br.readLine())!=null){
-                if(currentLineNo<=3){
-                    currentLineNo++;
-                    continue;
-                }
-                currentVectorType=currentLine.substring(currentLine.indexOf(";")+1,currentLine.indexOf(":"));
-                if (!currentVectorType.equals(previousVectorType)){
-                    if (previousVectorType.isEmpty()){
-                        //System.out.println(previousVectorType+" "+currentVectorType);
-                        //vectorRangeMap.put(currentVectorType,currentRange);
-                        currentRange.setStartPoint(currentLineNo);
-                        previousVectorType=currentVectorType;
-                        //System.out.println(previousVectorType+" "+currentVectorType);
-                        currentLineNo++;
-                        continue;
+
+            while((currentLine=br.readLine())!=null) {
+                if (currentLineNo > 3) {
+                    currentVectorType = currentLine.substring(currentLine.indexOf(";") + 1, currentLine.indexOf(":"));
+                    if (!currentVectorType.equals(previousVectorType)) {
+                        if (previousVectorType == "") {
+                            //System.out.println(previousVectorType+" "+currentVectorType);
+                            //vectorRangeMap.put(currentVectorType,currentRange);
+                            currentRange.setStartPoint(currentLineNo);
+                            currentRange.setOrder(3);
+                            previousVectorType = currentVectorType;
+                            //System.out.println(previousVectorType+" "+currentVectorType);
+
+                        }else{
+                            currentRange.setEndPoint(currentLineNo - 1);
+                            currentRange.setTotal();
+                            vectorRangeMap.put(previousVectorType, currentRange);
+                            int order = currentRange.getOrder();
+                            System.out.println(currentRange);
+                            currentRange = new VectorRange();
+                            currentRange.setOrder(order + 1);
+                            currentRange.setStartPoint(currentLineNo);
+                            previousVectorType = currentVectorType;
+                        }
+
+                    } else if (currentLineNo == 30970) {
+                        currentRange.setEndPoint(currentLineNo);
+                        currentRange.setTotal();
+                        vectorRangeMap.put(currentVectorType, currentRange);
                     }
-                    currentRange.setEndPoint(currentLineNo-1);
-                    currentRange.setTotal();
-                    vectorRangeMap.put(previousVectorType,currentRange);
-                    currentRange=new VectorRange();
-                    currentRange.setStartPoint(currentLineNo);
-                    previousVectorType=currentVectorType;
-                    currentLineNo++;
-                    continue;
-                }else if (currentLineNo==30970){
-                    currentRange.setEndPoint(currentLineNo);
-                    currentRange.setTotal();
-                    vectorRangeMap.put(currentVectorType,currentRange);
-                    continue;
                 }
                 currentLineNo++;
             }
             mapFile.createNewFile();
             writeMap();
-
         }
     }
 

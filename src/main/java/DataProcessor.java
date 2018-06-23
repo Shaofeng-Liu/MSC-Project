@@ -1,43 +1,82 @@
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+import  java.io.Writer;
+import com.opencsv.*;
 
 public class DataProcessor {
     private static String variableName="VariableNames.txt";
     private static String ransomwareData="RansomwareData.csv";
+    private static final String formattedRandomwareData="FormatedData.csv";
     private static  TypeToRangeMap trMap=null;
     private static HashMap<String, VectorRange> rMap;
     public static void main(String args[]) throws IOException, ClassNotFoundException {
         trMap=new TypeToRangeMap(variableName);
         rMap=trMap.getVectorRangeMap();
-        //System.out.println(rMap);
+        System.out.println(rMap);
         formatDatafile();
 
     }
 
     private static void formatDatafile() throws IOException {
+        for(String key:rMap.keySet()){
+            if(rMap.get(key).getOrder()==9)continue;
+            else if(rMap.get(key).getOrder()>5){
+                rMap.get(key).setOrder((rMap.get(key).getOrder()-1));
+            }
+        }
         rMap.remove("REG");
         rMap.remove("STR");
 
-        CSVParser parser= new CSVParserBuilder().withSeparator(',').build();
+        CSVParser parser= new CSVParserBuilder().withSeparator(',').withIgnoreQuotations(true).build();
         BufferedReader br = new BufferedReader(new FileReader(ransomwareData));
-        CSVReader reader = new CSVReaderBuilder(br).withSkipLines(1).withCSVParser(parser).build();
-        List<String[]> rows;
-        for (String key : rMap.keySet()){
-            for(int i = rMap.get(key).getStartPoint()-1; i<rMap.get(key).getEndPoint()-1;i++){
-            }
+        CSVReader csvRreader = new CSVReaderBuilder(br).withSkipLines(1).withCSVParser(parser).build();
+        //List<String[]> rows = new ArrayList();
+        List<String[]> newRecordList=new ArrayList();
+        File formatedFile = new File(formattedRandomwareData);
+        if (formatedFile.exists()){
+            System.out.println("Data already formated. \nDeleting exist file......");
+            formatedFile.delete();
+            //System.exit(0);
         }
+        BufferedWriter bw=new BufferedWriter(new FileWriter(formattedRandomwareData));
+        ICSVWriter csvWriter= new CSVWriterBuilder(bw).withParser(parser).build();
+        //String orderOfRecord="ID    Label   RansomwareFamily    ";
+        //int iterator=0;
+        String[] raw;
+        String[] newRec;
+        while(( raw=csvRreader.readNext())!=null){
+            newRec=new String[8];
+            newRec[0]=raw[0];
+            newRec[1]=raw[1];
+            newRec[2]=raw[2];
+            for (String key : rMap.keySet()){
+                int start=rMap.get(key).getStartPoint()-1;
+                int end = rMap.get(key).getEndPoint()-1;
+                int total=0;
+                for(int i=start;i<=end;i++){
+                    total+=Integer.parseInt(raw[i]);
+                }
+                newRec[rMap.get(key).getOrder()]=""+total;
+            }
+            newRecordList.add(newRec);
+            /*
+            for(String i : newRec){
+                System.out.print(" "+i+" ");
+            }
+            System.out.println();*/
 
         }
+        String[] headers={"ID",""};
+        csvWriter.writeAll(newRecordList);
+        csvWriter.flush();
+        csvWriter.close();
+        csvRreader.close();
 
     }
+
+}
 
