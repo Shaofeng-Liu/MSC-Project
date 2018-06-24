@@ -63,14 +63,19 @@ public class DataProcessor {
                 newRec[rMap.get(key).getOrder()]=""+total;
             }
             newRecordList.add(newRec);
-            /*
-            for(String i : newRec){
-                System.out.print(" "+i+" ");
-            }
-            System.out.println();*/
+
 
         }
-        String[] headers={"ID",""};
+        String[] headers={"ID","Lable","RansomwareFamily","","","","",""};
+        for(String key:rMap.keySet()){
+            headers[rMap.get(key).getOrder()]=key;
+            //System.out.print(key+" "+rMap.get(key).getOrder()+" \n");
+        }
+
+
+        System.out.println("Adding record header to CSV file......");
+        csvWriter.writeNext(headers);
+        System.out.println("Adding all record to CSV file......");
         csvWriter.writeAll(newRecordList);
         csvWriter.flush();
         csvWriter.close();
