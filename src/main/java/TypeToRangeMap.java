@@ -1,46 +1,50 @@
 import java.io.*;
 import java.util.HashMap;
 
-public class TypeToRangeMap implements Serializable{
+public class TypeToRangeMap implements Serializable {
     private static String variableName;
-    private static HashMap<String,VectorRange> vectorRangeMap;
-    private static String mapPath="RangeMap.txt";
+    private static HashMap<String, VectorRange> vectorRangeMap;
+    private static String mapPath = "RangeMap.txt";
+
     public TypeToRangeMap(String variableName) throws IOException, ClassNotFoundException {
-        this.variableName=variableName;
-        this.vectorRangeMap=new HashMap<String,VectorRange>();
+        this.variableName = variableName;
+        this.vectorRangeMap = new HashMap<String, VectorRange>();
         prepareNewDataset();
     }
+
     private void readMap() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream is =new ObjectInputStream(new FileInputStream(mapPath))){
-            this.vectorRangeMap=(HashMap<String, VectorRange>) is.readObject();
+        try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(mapPath))) {
+            this.vectorRangeMap = (HashMap<String, VectorRange>) is.readObject();
         }
 
     }
+
     private void writeMap() throws IOException {
-        try(ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(mapPath))) {
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(mapPath))) {
 
             os.writeObject(vectorRangeMap);
         }
     }
-    public  void prepareNewDataset() throws IOException, ClassNotFoundException {
 
-        File mapFile=new File(mapPath);
+    public void prepareNewDataset() throws IOException, ClassNotFoundException {
+
+        File mapFile = new File(mapPath);
 
 
-        if (mapFile.exists()){
+        if (mapFile.exists()) {
 
             readMap();
 
-        }else{
+        } else {
 
             BufferedReader br = new BufferedReader(new FileReader(variableName));
             String currentLine;
-            int currentLineNo=1;
-            String previousVectorType="";
+            int currentLineNo = 1;
+            String previousVectorType = "";
             String currentVectorType;
-            VectorRange currentRange=new VectorRange();
+            VectorRange currentRange = new VectorRange();
 
-            while((currentLine=br.readLine())!=null) {
+            while ((currentLine = br.readLine()) != null) {
                 if (currentLineNo > 3) {
                     currentVectorType = currentLine.substring(currentLine.indexOf(";") + 1, currentLine.indexOf(":"));
                     if (!currentVectorType.equals(previousVectorType)) {
@@ -52,7 +56,7 @@ public class TypeToRangeMap implements Serializable{
                             previousVectorType = currentVectorType;
                             //System.out.println(previousVectorType+" "+currentVectorType);
 
-                        }else{
+                        } else {
                             currentRange.setEndPoint(currentLineNo - 1);
                             currentRange.setTotal();
                             vectorRangeMap.put(previousVectorType, currentRange);
@@ -77,14 +81,14 @@ public class TypeToRangeMap implements Serializable{
         }
     }
 
-    public  HashMap<String, VectorRange> getVectorRangeMap() {
+    public HashMap<String, VectorRange> getVectorRangeMap() {
         return vectorRangeMap;
     }
 
-    public String toString (){
-        String output="";
-        for (String key:vectorRangeMap.keySet()){
-            output+=key+": "+vectorRangeMap.get(key)+".\n";
+    public String toString() {
+        String output = "";
+        for (String key : vectorRangeMap.keySet()) {
+            output += key + ": " + vectorRangeMap.get(key) + ".\n";
         }
         return output;
     }
