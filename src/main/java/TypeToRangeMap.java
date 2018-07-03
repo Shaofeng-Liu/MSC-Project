@@ -1,5 +1,7 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class TypeToRangeMap implements Serializable {
     private static String variableName;
@@ -85,6 +87,22 @@ public class TypeToRangeMap implements Serializable {
         return vectorRangeMap;
     }
 
+    public static String[] getVarNames(String varNameFile) throws IOException {
+        List<String> varNames = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader(varNameFile));
+        String tmpLine=br.readLine();
+
+        while(tmpLine!=null){
+            varNames.add(tmpLine.substring(tmpLine.indexOf(';')+1));
+            System.out.println("Getting Var Name: "+tmpLine.substring(tmpLine.indexOf(';')+1));
+            tmpLine=br.readLine();
+            //totalLine++;
+        }
+        String[] strArray;
+        strArray= (String[]) varNames.toArray(new String[varNames.size()]);
+        System.out.println("Total number of variables: "+varNames.size());
+        return strArray;
+    }
     public String toString() {
         String output = "";
         for (String key : vectorRangeMap.keySet()) {

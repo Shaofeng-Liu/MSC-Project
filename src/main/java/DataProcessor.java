@@ -1,6 +1,7 @@
 import com.opencsv.*;
 
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,8 @@ public class DataProcessor {
         trMap = new TypeToRangeMap(variableName);
         rMap = trMap.getVectorRangeMap();
         System.out.println(rMap);
-        formatDatafile();
+        //formatDatafile();
+        addHeader(ransomwareData,variableName);
 
     }
 
@@ -81,6 +83,26 @@ public class DataProcessor {
         csvRreader.close();
 
     }
+    private static void addHeader(String targetCSV,String hdrFile) throws IOException {
+        String[] hdr=trMap.getVarNames(hdrFile);
+        File ransomCSV = new File("RansomwareDataWithHeaders.csv");
+        //Read all records and create new file with headers.
+        CSVParser parser = new CSVParserBuilder().withSeparator(',').withIgnoreQuotations(true).build();
+        BufferedReader br = new BufferedReader(new FileReader(ransomwareData));
+        CSVReader csvRreader = new CSVReaderBuilder(br).withCSVParser(parser).build();
+        System.out.println("Reading original dataset......");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(ransomCSV));
+        ICSVWriter csvWriter = new CSVWriterBuilder(bw).withParser(parser).build();
+
+        System.out.println("Writing header to file......");
+        csvWriter.writeNext(hdr);
+        System.out.println("Writing data to file......");
+        csvWriter.writeAll(csvRreader.readAll());
+        System.out.println("Update complete......");
+        csvWriter.close();
+        csvRreader.close();
+    }
+
 
 }
 
