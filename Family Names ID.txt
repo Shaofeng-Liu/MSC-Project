@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FAMILY NAME          ID
 ------------------------------
 Goodware              0
@@ -13,3 +14,20 @@ Goodware              0
 'TeslaCrypt'         10
 'Trojan-Ransom'      11
 
+=======
+FAMILY NAME          ID
+------------------------------
+Goodware              0
+'Critroni'            1
+'CryptLocker'         2
+'CryptoWall'          3
+'KOLLAH'              4
+'Kovter'              5
+'Locker'              6
+'MATSNU'              7
+'PGPCODER'            8
+'Reveton'             9
+'TeslaCrypt'         10
+'Trojan-Ransom'      11
+
+>>>>>>> 8a6f4227e0dbef0efbada4d542399e0be426174e

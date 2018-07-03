@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 *.csv
 BadFiles/*
 RansomwareDataWithHeader.csv
+=======
+BadFiles/*
+BadFiles
+>>>>>>> 8a6f4227e0dbef0efbada4d542399e0be426174e
