@@ -1,2 +1,2 @@
-FormatedData.csv NewRansomdata.csv RansomwareData.csv RansomwareDataWithHeaders.csv
-BadFiles/
+BadFiles/* 
+ *.csv
